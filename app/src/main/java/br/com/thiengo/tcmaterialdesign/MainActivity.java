@@ -3,6 +3,7 @@ package br.com.thiengo.tcmaterialdesign;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import br.com.thiengo.tcmaterialdesign.domain.Car;
+import br.com.thiengo.tcmaterialdesign.fragments.CarFragment;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -39,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 Intent it = null;
 
-                switch(menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.action_facebook:
                         it = new Intent(Intent.ACTION_VIEW);
                         it.setData(Uri.parse("http://www.facebook.com"));
@@ -64,8 +71,8 @@ public class MainActivity extends ActionBarActivity {
 
                 startActivity(it);
                 return true; // True =  não deve-se continuar o processamento, pois ja foi processado
-                             // o que foi enviado no onMenuItemClick
-             }
+                // o que foi enviado no onMenuItemClick
+            }
         });
         mToolbarBottom.inflateMenu(R.menu.menu_bottom);
 
@@ -75,6 +82,16 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(MainActivity.this, "Settings pressed", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // FRAGMENT
+        CarFragment fragment = (CarFragment) getSupportFragmentManager().findFragmentByTag("mainFrag");
+        if (fragment == null) {
+            // CRIAÇÃO (CASO AINDA NÃO EXISTA)
+            fragment = new CarFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.rl_fragment_container, fragment, "mainFragment");
+            fragmentTransaction.commit();
+        }
     }
 
 
@@ -89,10 +106,24 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.action_second_activity){
+        if (id == R.id.action_second_activity) {
             startActivity(new Intent(this, SecondActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /* METODO USADO NO PREENCHIMENTO DO RECICLEVIEW */
+    public List<Car> getSetCarList(int qtd) {
+        String[] models = new String[]{"Gallardo", "Vyron", "Corvette", "Pagani Zonda", "Porsche 911 Carrera", "BMW 720i", "DB77", "Mustang", "Camaro", "CT6"};
+        String[] brands = new String[]{"Lamborghini", " bugatti", "Chevrolet", "Pagani", "Porsche", "BMW", "Aston Martin", "Ford", "Chevrolet", "Cadillac"};
+        int[] photos = new int[]{R.drawable.gallardo, R.drawable.vyron, R.drawable.corvette, R.drawable.paganni_zonda, R.drawable.porsche_911, R.drawable.bmw_720, R.drawable.db77, R.drawable.mustang, R.drawable.camaro, R.drawable.ct6};
+        List<Car> listAux = new ArrayList<>();
+
+        for(int i = 0; i < qtd; i++){
+            Car c = new Car(models[i % models.length], brands[i % brands.length], photos[i % photos.length]);
+            listAux.add(c);
+        }
+        return listAux;
     }
 }

@@ -16,13 +16,13 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:background="?attr/colorPrimary" />
 
-    <TextView
-        android:layout_below="@+id/tb_main"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/hello_world"
-        android:textColor="@color/black" />
+        android:id="@+id/rl_fragment_container"
+        android:layout_below="@+id/tb_main"
+        android:layout_above="@+id/inc_tb_bottom">
+    </RelativeLayout>
 
     <include
         android:id="@+id/inc_tb_bottom"
