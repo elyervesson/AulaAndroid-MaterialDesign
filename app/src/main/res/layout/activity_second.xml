@@ -8,14 +8,15 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_main"
-        android:layout_height="?attr/actionBarSize"
         android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
         android:minHeight="?attr/actionBarSize"
         android:layout_alignParentLeft="true"
-        android:layout_margin="8dp"
-        android:elevation="4dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:background="@drawable/shadow"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        android:layout_margin="8dp" />
 
     <TextView
         android:layout_below="@+id/tb_main"
