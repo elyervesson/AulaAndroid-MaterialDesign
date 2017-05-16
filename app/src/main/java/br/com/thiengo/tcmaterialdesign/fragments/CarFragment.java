@@ -1,10 +1,13 @@
 package br.com.thiengo.tcmaterialdesign.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -64,6 +67,8 @@ public class CarFragment extends Fragment implements RecyclerViewOnClickListener
 
         });
 
+        /* TRATAMENTO DO CLIQUE */
+        recyclerView.addOnItemTouchListener(new RecycleViewTouchListener(getActivity(), recyclerView, this));
 
         /* GERENCIA A APRESENTAÇÃO DOS ITENS */
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -72,7 +77,7 @@ public class CarFragment extends Fragment implements RecyclerViewOnClickListener
 
         cars = ((MainActivity) getActivity()).getSetCarList(10);
         CarAdapter adapter = new CarAdapter(getActivity(), cars); // Criação do adapter
-        adapter.setRecyclerViewOnClickListenerHack(this);
+        // adapter.setRecyclerViewOnClickListenerHack(this);
         recyclerView.setAdapter(adapter);
 
         return view;
@@ -80,9 +85,68 @@ public class CarFragment extends Fragment implements RecyclerViewOnClickListener
 
     @Override
     public void onClickListener(View view, int position) {
-        Toast.makeText(getActivity(), "Position: " + position, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "onClickListener(): " + position, Toast.LENGTH_SHORT).show();
 
         CarAdapter adapter = (CarAdapter) recyclerView.getAdapter();
         adapter.removeListItem(position);
+    }
+
+    @Override
+    public void onLongPressClickListener(View view, int position) {
+        Toast.makeText(getActivity(), "onLongPressClickListener(): " + position, Toast.LENGTH_SHORT).show();
+
+        CarAdapter adapter = (CarAdapter) recyclerView.getAdapter();
+        adapter.removeListItem(position);
+    }
+
+    /* Outra forma de click listener e pressed click listener */
+    private static class RecycleViewTouchListener implements RecyclerView.OnItemTouchListener {
+        private Context context;
+        private GestureDetector gestureDetector;
+        private RecyclerViewOnClickListenerHack listenerHack;
+
+        public RecycleViewTouchListener(Context cntxt,final RecyclerView recyclerView, RecyclerViewOnClickListenerHack recyclerViewOnClickListenerHack) {
+            context = cntxt;
+            listenerHack = recyclerViewOnClickListenerHack;
+
+            /* ATRAVEZ DESSE GESTYRE DETECTOR É POSSIVEL IDENTIFICAR QUE TIPO DE CLIQUE FOI EXECUTADO */
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public void onLongPress(MotionEvent event) {
+                    super.onLongPress(event);
+                    /* RETORNA A CHILD VIEW QUE ESTA ABAIXO DO LOCAL ONDE FOI CLICADO */
+                    View view = recyclerView.findChildViewUnder(event.getX(), event.getY());
+
+                    if(view != null && listenerHack != null) {
+                        listenerHack.onLongPressClickListener(view, recyclerView.getChildLayoutPosition(view)); /* ERRRRRRRRRRRRRRRRRRRRRRROR */
+                    }
+                }
+
+                @Override
+                public boolean onSingleTapUp(MotionEvent event) {
+                    /* RETORNA A CHILD VIEW QUE ESTA ABAIXO DO LOCAL ONDE FOI CLICADO */
+                    View view = recyclerView.findChildViewUnder(event.getX(), event.getY());
+
+                    if(view != null && listenerHack != null) {
+                        listenerHack.onClickListener(view, recyclerView.getChildLayoutPosition(view)); /* ERRRRRRRRRRRRRRRRRRRRRRROR */
+                    }
+
+                    return true; /* SIGNIFICA QUE INTERCEPTAMOS A AÇÃO E ESTAMOS TRABALHANDO NELA */
+                    // return super.onSingleTapUp(event);
+                }
+            });
+        }
+
+        /* QUANDO CLICADO, SEMPRE PASSARA NESSA CLASSE */
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            gestureDetector.onTouchEvent(e); /* AQUI SERA FEITO O REDIRECIONAMENTO PARA OS METODOS QUE TRATAM CLIQUE SIMPLES OU LONGO */
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
     }
 }
