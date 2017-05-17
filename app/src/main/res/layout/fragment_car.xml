@@ -8,7 +8,7 @@ tools:context="br.com.thiengo.tcmaterialdesign.fragments.CarFragment">
     android:id="@+id/rv_list"
     android:scrollbars="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="wrap_content"/>
 
 </FrameLayout>
 

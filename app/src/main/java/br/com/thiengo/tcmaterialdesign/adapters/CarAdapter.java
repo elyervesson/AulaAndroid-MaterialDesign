@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+
 import java.util.List;
 
 import br.com.thiengo.tcmaterialdesign.R;
@@ -48,6 +51,15 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.MyViewHolder>{
         holder.imageViewCar.setImageResource(cars.get(position).getPhoto());
         holder.textViewModel.setText(cars.get(position).getModel());
         holder.textViewBrand.setText(cars.get(position).getBrand());
+
+        try {
+            YoYo.with(Techniques.Tada)
+                    .duration(700)
+                    .repeat(1)
+                    .playOn(holder.itemView);
+        }catch (Exception e){
+
+        }
     }
 
     /* TAMANHO DO SET (LISTA DE CARROS) */

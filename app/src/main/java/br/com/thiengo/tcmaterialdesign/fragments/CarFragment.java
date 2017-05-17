@@ -3,8 +3,10 @@ package br.com.thiengo.tcmaterialdesign.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -52,10 +54,23 @@ public class CarFragment extends Fragment implements RecyclerViewOnClickListener
                 super.onScrolled(recyclerView, dx, dy);
 
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                // GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+
+                /*
+                StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
+
+                // Equivalente ao findLastCompletelyVisibleItemPosition()
+                int[] aux = layoutManager.findFirstCompletelyVisibleItemPositions(null);
+                int max = -1;
+                for (int i = 0; i < aux.length; i++){
+                    max = aux[i] > max ? aux[i] : max;
+                }
+                */
                 CarAdapter adapter = (CarAdapter) recyclerView.getAdapter();
 
                 // Nesse caso estamos mostrando o ultimo item
                 if (cars.size() == layoutManager.findLastCompletelyVisibleItemPosition() + 1) {
+                //if (cars.size() == max + 1) {
                     // Carregar mais 10
                     List<Car> listAux = ((MainActivity) getActivity()).getSetCarList(10);
 
@@ -73,7 +88,24 @@ public class CarFragment extends Fragment implements RecyclerViewOnClickListener
         /* GERENCIA A APRESENTAÇÃO DOS ITENS */
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        // layoutManager.setReverseLayout(true); // Preenche de baixo para cima e não o inverso
         recyclerView.setLayoutManager(layoutManager);
+
+        /* GERENCIA A APRESENTAÇÃO DOS ITENS */
+        /* O PROBLEMA DESSA IMPLEMENTAÇÃO É QUE NA APRESENTAÇÃO SÃO VISIVEIS ALGUNS GAPS
+        final int colunas = 3;
+        final boolean setReverseLayout = false;
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), colunas,GridLayoutManager.VERTICAL, setReverseLayout);
+        recyclerView.setLayoutManager(layoutManager);
+        */
+
+        /* GERENCIA A APRESENTAÇÃO DOS ITENS */
+        /*
+        final int colunas = 3;
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(colunas,StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        recyclerView.setLayoutManager(layoutManager);
+        */
 
         cars = ((MainActivity) getActivity()).getSetCarList(10);
         CarAdapter adapter = new CarAdapter(getActivity(), cars); // Criação do adapter
@@ -146,6 +178,11 @@ public class CarFragment extends Fragment implements RecyclerViewOnClickListener
 
         @Override
         public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
         }
     }
