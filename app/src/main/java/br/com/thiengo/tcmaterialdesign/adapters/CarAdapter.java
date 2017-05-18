@@ -1,6 +1,9 @@
 package br.com.thiengo.tcmaterialdesign.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import java.util.List;
 
 import br.com.thiengo.tcmaterialdesign.R;
 import br.com.thiengo.tcmaterialdesign.domain.Car;
+import br.com.thiengo.tcmaterialdesign.extras.ImageHelper;
 import br.com.thiengo.tcmaterialdesign.interfaces.RecyclerViewOnClickListenerHack;
 
 /**
@@ -24,13 +28,22 @@ import br.com.thiengo.tcmaterialdesign.interfaces.RecyclerViewOnClickListenerHac
 // ViewHolder: trabalha a cash, guardando a view para ser reutilizada
 public class CarAdapter extends RecyclerView.Adapter<CarAdapter.MyViewHolder>{
 
+    private Context cntext;
     private List<Car> cars; // Este List esta na mesma posição de memoria do List de CarFragment
     private LayoutInflater layoutInflater;
     private RecyclerViewOnClickListenerHack recyclerViewOnClickListenerHack;
+    private float scale;
+    private int width;
+    private int height;
 
     public CarAdapter(Context context, List<Car> list){
+        cntext = context;
         cars = list;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        scale = cntext.getResources().getDisplayMetrics().density;
+        width = cntext.getResources().getDisplayMetrics().widthPixels - (int)(14 * scale + 0.5f) ;
+        height = (width / 16) * 9;// Como estamos utilizando o aspect 16:9
     }
 
 
@@ -39,7 +52,8 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.MyViewHolder>{
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.i("CarAdapter", "onCreateViewHolder");
         // O terceiro parametro é para utilizar o layout parameters do recicleView parent
-        View view = layoutInflater.inflate(R.layout.item_car, parent, false);
+        // View view = layoutInflater.inflate(R.layout.item_car, parent, false);
+        View view = layoutInflater.inflate(R.layout.item_car_card, parent, false);
         MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;
     }
@@ -48,9 +62,22 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.MyViewHolder>{
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Log.i("CarAdapter", "onBindViewHolder");
-        holder.imageViewCar.setImageResource(cars.get(position).getPhoto());
+        // holder.imageViewCar.setImageResource(cars.get(position).getPhoto());
+
         holder.textViewModel.setText(cars.get(position).getModel());
         holder.textViewBrand.setText(cars.get(position).getBrand());
+
+        // No exemplo feito pelo thiengo era necessario deixar o if, porem para mim funcionou melhor assim
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.imageViewCar.setImageResource(cars.get(position).getPhoto());
+        //} else {
+            Bitmap bitmap = BitmapFactory.decodeResource(cntext.getResources(), cars.get(position).getPhoto());
+            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
+
+            // Não devemos utilizar este metodo para imagens muito grandes pois pode ficar muito pesado
+            bitmap = ImageHelper.getRoundedCornerBitmap(cntext, bitmap, 10, width, height, false, false, true, true);
+            holder.imageViewCar.setImageBitmap(bitmap);
+        //}
 
         try {
             YoYo.with(Techniques.Tada)
